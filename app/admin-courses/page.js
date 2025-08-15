@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import AdminSidebar from "../components/adminsidebar";
+import ContentAdder from "../popup/page";// Make sure to create this component file
 
 export default function CoursesPage() {
   // State management
@@ -8,17 +9,25 @@ export default function CoursesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("courses");
+  const [showContentAdder, setShowContentAdder] = useState(false);
+  const [selectedCourseId, setSelectedCourseId] = useState(null);
   
   // Form states
   const [formData, setFormData] = useState({
     title: "",
-    description: ""
+    description: "",
+    subject:"",
+    professorname:"",
+    assigment:""
   });
   
   const [editData, setEditData] = useState({
     id: "",
     title: "",
-    description: ""
+    description: "",
+    subject:"",
+    professorname:"",
+    assigment:""
   });
 
   // Color scheme
@@ -73,7 +82,9 @@ export default function CoursesPage() {
         body: JSON.stringify(formData),
       });
       if (!res.ok) throw new Error("Failed to add course");
-      setFormData({ title: "", description: "" });
+      setFormData({ title: "", description: "",subject:"",
+      professorname:"",
+      assigment:"" });
       await fetchCourses();
     } catch (err) {
       setError(err.message);
@@ -85,7 +96,10 @@ export default function CoursesPage() {
     setEditData({
       id: course._id,
       title: course.title,
-      description: course.description
+      description: course.description,
+      subject: course.subject,
+      professorname: course.professorname,
+      assigment: course.assigment
     });
     setActiveTab("edit");
   };
@@ -101,12 +115,17 @@ export default function CoursesPage() {
           id: editData.id,
           update: { 
             title: editData.title, 
-            description: editData.description 
+            description: editData.description,
+            subject: editData.subject,
+            professorname: editData.professorname,
+            assigment: editData.assigment 
           },
         }),
       });
       if (!res.ok) throw new Error("Failed to update course");
-      setEditData({ id: "", title: "", description: "" });
+      setEditData({ id: "", title: "", description: "",subject:"",
+      professorname:"",
+      assigment:"" });
       setActiveTab("courses");
       await fetchCourses();
     } catch (err) {
@@ -127,6 +146,12 @@ export default function CoursesPage() {
     } catch (err) {
       setError(err.message);
     }
+  };
+
+  // Open content adder for a specific course
+  const openContentAdder = (courseId) => {
+    setSelectedCourseId(courseId);
+    setShowContentAdder(true);
   };
 
   return (
@@ -210,9 +235,42 @@ export default function CoursesPage() {
                       name="title"
                       value={formData.title}
                       onChange={(e) => handleInputChange(e)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition"
+                      className="w-full px-4 mb-2 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition"
                       style={{ borderColor: colors.border }}
                       placeholder="Enter course title"
+                      required
+                    />
+                    <label className="block text-sm font-medium mb-2">Subject</label>
+                    <input
+                      type="text"
+                      name="subject"
+                      value={formData.subject}
+                      onChange={(e) => handleInputChange(e)}
+                      className="w-full px-4 mb-2 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition"
+                      style={{ borderColor: colors.border }}
+                      placeholder="Enter Course"
+                      required
+                    />
+                    <label className="block text-sm font-medium mb-2">Professor Name</label>
+                    <input
+                      type="text"
+                      name="professorname"
+                      value={formData.professorname}
+                      onChange={(e) => handleInputChange(e)}
+                      className="w-full px-4  mb-2 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition"
+                      style={{ borderColor: colors.border }}
+                      placeholder="Enter tutor name"
+                      required
+                    />
+                    <label className="block text-sm font-medium mb-2">Assigment</label>
+                    <input
+                      type="text"
+                      name="assigment"
+                      value={formData.assigment}
+                      onChange={(e) => handleInputChange(e)}
+                      className="w-full px-4  mb-2 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition"
+                      style={{ borderColor: colors.border }}
+                      placeholder="Enter Assigment "
                       required
                     />
                   </div>
@@ -269,7 +327,41 @@ export default function CoursesPage() {
                       style={{ borderColor: colors.border }}
                       required
                     />
+                    <label className="block text-sm font-medium mb-2">Subject</label>
+                    <input
+                      type="text"
+                      name="subject"
+                      value={editData.subject}
+                      onChange={(e) => handleInputChange(e, true)}
+                      className="w-full px-4 mb-2 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition"
+                      style={{ borderColor: colors.border }}
+                      placeholder="Enter Course"
+                      required
+                    />
+                    <label className="block text-sm font-medium mb-2">Professor Name</label>
+                    <input
+                      type="text"
+                      name="professorname"
+                      value={editData.professorname}
+                      onChange={(e) => handleInputChange(e, true)}
+                      className="w-full px-4  mb-2 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition"
+                      style={{ borderColor: colors.border }}
+                      placeholder="Enter tutor name"
+                      required
+                    />
+                    <label className="block text-sm font-medium mb-2">Assigment</label>
+                    <input
+                      type="text"
+                      name="assigment"
+                      value={editData.assigment}
+                      onChange={(e) => handleInputChange(e, true)}
+                      className="w-full px-4  mb-2 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition"
+                      style={{ borderColor: colors.border }}
+                      placeholder="Enter Assigment "
+                      required
+                    />
                   </div>
+                  
                   <div className="mb-6">
                     <label className="block text-sm font-medium mb-2">Description</label>
                     <textarea
@@ -356,6 +448,12 @@ export default function CoursesPage() {
                             </div>
                             <div className="flex space-x-3">
                               <button
+                                onClick={() => openContentAdder(course._id)}
+                                className="px-4 py-2 rounded-lg border border-gray-300 text-sm font-medium hover:bg-gray-100 transition-colors"
+                              >
+                                Add Content
+                              </button>
+                              <button
                                 onClick={() => prepareEdit(course)}
                                 className="px-4 py-2 rounded-lg border border-gray-300 text-sm font-medium hover:bg-gray-100 transition-colors"
                               >
@@ -380,6 +478,14 @@ export default function CoursesPage() {
           </div>
         </div>
       </div>
+
+      {/* ContentAdder Popup */}
+      {showContentAdder && (
+        <ContentAdder 
+          onClose={() => setShowContentAdder(false)}
+          courseId={selectedCourseId}
+        />
+      )}
     </div>
   );
 }
